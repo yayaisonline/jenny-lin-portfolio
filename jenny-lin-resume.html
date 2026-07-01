@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jenny Lin — Resume</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1c;
+    --ink-soft: #4a4c50;
+    --ink-muted: #8a8e94;
+    --rule: #d0d3d8;
+    --accent: #4a4c50;
+    --accent-light: #e8eaec;
+    --page: #faf9f7;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--page);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page {
+    width: 816px;
+    min-height: 1056px;
+    background: var(--page);
+    padding: 52px 60px 48px;
+    position: relative;
+  }
+
+  /* Left accent bar — matches nav active line feel */
+  .page::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 1.5px; height: 100%;
+    background: var(--ink);
+    opacity: 0.15;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 20px;
+    border-bottom: 0.5px solid var(--rule);
+    margin-bottom: 26px;
+  }
+
+  .name-block h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px; font-weight: 300;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .name-block .title-line {
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.20em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .contact-block {
+    text-align: right;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .contact-block a, .contact-block span {
+    font-size: 11px; color: var(--ink-muted);
+    text-decoration: none; letter-spacing: 0.01em;
+  }
+  .contact-block a:hover { color: var(--ink); }
+
+  /* Body layout */
+  .body {
+    display: grid;
+    grid-template-columns: 188px 1fr;
+    gap: 0 36px;
+  }
+
+  /* Section */
+  .section { margin-bottom: 22px; }
+
+  .section-label {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 0.5px solid var(--rule);
+  }
+
+  /* Left column */
+  .left p, .left li {
+    font-size: 11px; color: var(--ink-soft); line-height: 1.65;
+  }
+  .left ul { list-style: none; }
+
+  .skill-category {
+    font-size: 10px; font-weight: 500;
+    color: var(--ink); letter-spacing: 0.05em;
+    margin-top: 8px; margin-bottom: 3px;
+  }
+  .skill-category:first-child { margin-top: 0; }
+
+  /* Right column entries */
+  .entry {
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 10px;
+  }
+  .entry-head { grid-column: 1 / 2; }
+  .entry-date {
+    grid-column: 2 / 3; grid-row: 1 / 2;
+    font-size: 10.5px; color: var(--ink-muted);
+    white-space: nowrap; padding-top: 1px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .entry-title {
+    font-size: 12.5px; font-weight: 500;
+    color: var(--ink); line-height: 1.3;
+  }
+  .entry-sub {
+    font-size: 13px; font-weight: 300;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink-soft); margin-top: 1px;
+  }
+  .entry-meta {
+    font-size: 10.5px; color: var(--ink-muted); margin-top: 1px;
+  }
+  .entry-bullets {
+    grid-column: 1 / 3; margin-top: 5px;
+    padding-left: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .entry-bullets li {
+    font-size: 11px; color: var(--ink-soft);
+    line-height: 1.55; padding-left: 12px; position: relative;
+  }
+  .entry-bullets li::before {
+    content: '—'; position: absolute; left: 0;
+    color: var(--rule); font-size: 10px; top: 1px;
+  }
+
+  /* Education */
+  .edu-gpa {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 9.5px; font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 2px 8px; margin-top: 5px; border-radius: 2px;
+  }
+
+  /* Awards */
+  .award-item { margin-bottom: 7px; }
+  .award-name { font-size: 11.5px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+  .award-detail {
+    font-size: 12.5px; font-weight: 300;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink-muted);
+  }
+
+  /* Presentations */
+  .pres-item { margin-bottom: 7px; }
+  .pres-title {
+    font-size: 13px; font-weight: 300;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink-soft); line-height: 1.4;
+  }
+  .pres-venue { font-size: 10.5px; color: var(--ink-muted); margin-top: 1px; }
+
+  /* Right dividers */
+  .right .section + .section {
+    border-top: 0.5px solid var(--rule);
+    padding-top: 18px;
+  }
+  .left .section + .section {
+    border-top: 0.5px solid var(--rule);
+    padding-top: 16px;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="name-block">
+      <h1>Jenny Lin</h1>
+      <div class="title-line">Journalism &nbsp;&middot;&nbsp; Research &nbsp;&middot;&nbsp; Gender &amp; Women's Studies</div>
+    </div>
+    <div class="contact-block">
+      <span>sijiel2@illinois.edu</span>
+      <a href="https://www.linkedin.com/in/jenny-lin-03593824a/?locale=zh" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.instagram.com/archive4yaya/" target="_blank" rel="noopener">Instagram</a>
+      <span>Champaign, IL</span>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <!-- LEFT COLUMN -->
+    <aside class="left">
+
+      <div class="section" id="education">
+        <div class="section-label">Education</div>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);line-height:1.4;">University of Illinois Urbana-Champaign</div>
+          <div style="font-size:13px;font-weight:300;font-style:italic;font-family:'Cormorant Garamond',serif;color:var(--ink-soft);margin-top:2px;">B.S. Journalism</div>
+          <div style="font-size:10.5px;color:var(--ink-muted);">Minor in Gender &amp; Women's Studies</div>
+          <div style="font-size:10.5px;color:var(--ink-muted);margin-top:2px;">2022 – 2026</div>
+          <span class="edu-gpa">Highest Honor</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Skills</div>
+        <div class="skill-category">Programming</div>
+        <p>Python, SQL, Java, HTML, CSS</p>
+        <div class="skill-category">Software</div>
+        <p>Adobe Creative Suite, Microsoft Office</p>
+        <div class="skill-category">Multimedia</div>
+        <p>News writing, videography, photography, graphic design, data analysis</p>
+        <div class="skill-category">Languages</div>
+        <p>English (professional)</p>
+        <p>Mandarin Chinese (native)</p>
+      </div>
+
+      <div class="section" id="honors">
+        <div class="section-label">Honors</div>
+        <div class="award-item">
+          <div class="award-name">Kappa Tau Alpha</div>
+          <div class="award-detail">Honor society inductee, 2026</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">Edmund J. James Scholar</div>
+          <div class="award-detail">Highest honor, College of Media, 2024–25</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">Dean's List</div>
+          <div class="award-detail">All semesters, 2022–2026</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">Brody Feature Writing Award</div>
+          <div class="award-detail">3rd place &nbsp;·&nbsp; $1,000, April 2026</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">Brett Lerner Scholarship</div>
+          <div class="award-detail">$8,000 total, 2024–2026</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">Fred S. Bailey Scholarship</div>
+          <div class="award-detail">$4,000, University YMCA, 2025–26</div>
+        </div>
+        <div class="award-item">
+          <div class="award-name">G. Hanson Visual Communication</div>
+          <div class="award-detail">$1,200, 2023–2024</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT COLUMN -->
+    <main class="right">
+
+      <div class="section" id="journalism">
+        <div class="section-label">Journalism &amp; Media</div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Data Journalism Reporter</div>
+            <div class="entry-sub">University of Illinois Urbana-Champaign</div>
+          </div>
+          <div class="entry-date">Jan 2026 – Present</div>
+          <ul class="entry-bullets">
+            <li>Analyzing Ghana Census data on domestic migration and secondhand clothing markets for a documentary on Kantamanto Market, Accra</li>
+            <li>Designing data visualizations integrated with multimedia storytelling for project website</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Investigative Reporter</div>
+            <div class="entry-sub">Illinois Public Media &amp; Invisible Institute</div>
+          </div>
+          <div class="entry-date">Jun 2025 – Present</div>
+          <ul class="entry-bullets">
+            <li>Reporting on the policing beat; investigating statewide enforcement issues via data analysis and FOIA requests</li>
+            <li>Producing multimedia content across audio, digital, and photo formats</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Investigative Reporter</div>
+            <div class="entry-sub">CU CitizenAccess</div>
+          </div>
+          <div class="entry-date">Jan – Jul 2025</div>
+          <ul class="entry-bullets">
+            <li>Reported on utility affordability and federal funding cuts; analyzed FOIA and public data using Python, SQL, and visualization tools</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Feature Writer</div>
+            <div class="entry-sub">The Daily Illini</div>
+          </div>
+          <div class="entry-date">Sep 2023 – Feb 2025</div>
+          <ul class="entry-bullets">
+            <li>Covered diversity, equity, campus life, and culture; collaborated with nonprofits across Champaign-Urbana</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section" id="research">
+        <div class="section-label">Research</div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Research Assistant — AI &amp; Health Communication</div>
+            <div class="entry-sub">Advisor: Dr. Leona Yi-Fan Su, UIUC</div>
+          </div>
+          <div class="entry-date">Feb – Jul 2025</div>
+          <ul class="entry-bullets">
+            <li>Conducted 50+ literature reviews on AI chatbot efficacy, message framing, and behavioral theory</li>
+            <li>Assisted with theoretical model refinement and survey design under doctoral-level mentorship</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Research Assistant — Muslim Queer Resilience</div>
+            <div class="entry-sub">Advisor: Dr. Mahruq Khan, UIUC</div>
+          </div>
+          <div class="entry-date">Mar – Aug 2025</div>
+          <ul class="entry-bullets">
+            <li>Organized academic sources across Muslim studies, gender &amp; women's studies, and religious studies</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section" id="teaching">
+        <div class="section-label">Teaching</div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Teaching Assistant — Introduction to Journalism</div>
+            <div class="entry-sub">University of Illinois Urbana-Champaign</div>
+          </div>
+          <div class="entry-date">Jan 2026 – Present</div>
+          <ul class="entry-bullets">
+            <li>Graded assignments and exams for 25 students; provided AP Style and news writing feedback during weekly office hours</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-title">Social Justice Workshop Facilitator</div>
+            <div class="entry-sub">University of Illinois Urbana-Champaign</div>
+          </div>
+          <div class="entry-date">Sep – Nov 2025</div>
+          <ul class="entry-bullets">
+            <li>Led 30+ diversity and inclusion workshops for 700+ freshmen; facilitated critical thinking discussions and creative exercises</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section" id="presentations">
+        <div class="section-label">Selected Presentations</div>
+
+        <div class="pres-item">
+          <div class="pres-title">"Queering the Dorm: Tracing Allen Hall's LGBTQ History Through Oral History"</div>
+          <div class="pres-venue">UIUC Undergraduate Research Symposium &nbsp;·&nbsp; April 2026</div>
+        </div>
+        <div class="pres-item">
+          <div class="pres-title">"Telling and Untelling: A Radical Reading of Intersex Danmei Literature"</div>
+          <div class="pres-venue">UIUC Gender &amp; Women's Studies Senior Symposium &nbsp;·&nbsp; December 2025</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>

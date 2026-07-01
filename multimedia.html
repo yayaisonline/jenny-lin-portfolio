@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimedia — Jenny Lin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #eceef0; --ink: #1a1a1c;
+    --ink-soft: #4a4c50; --ink-muted: #8a8e94; --rule: #d0d3d8;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    background: var(--bg); color: var(--ink);
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 300px; mix-blend-mode: overlay; opacity: 0.5;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 28px 52px; white-space: nowrap;
+    background: rgba(236,238,240,0.92); backdrop-filter: blur(8px);
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 11px; font-weight: 400; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--ink-muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 120px 52px 100px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+    padding-bottom: 28px;
+    border-bottom: 0.5px solid var(--rule);
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; font-weight: 300;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .page-desc {
+    font-size: 13.5px; font-weight: 300;
+    line-height: 1.85; color: var(--ink-soft);
+    max-width: 100%; margin-bottom: 52px;
+  }
+
+  /* Project list — same pattern as story-list */
+  .project-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-item {
+    display: flex;
+    flex-direction: column;
+    padding: 36px 0;
+    border-bottom: 0.5px solid var(--rule);
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+  .project-meta {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .project-date {
+    font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-muted);
+  }
+
+  /* Tags */
+  .project-tags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted); border: 0.5px solid var(--rule);
+    padding: 3px 8px;
+  }
+
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .project-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 300;
+    line-height: 1.3; margin-bottom: 14px;
+  }
+  .project-title a {
+    color: var(--ink); text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .project-title a:hover { opacity: 0.55; }
+
+  .project-desc {
+    font-size: 13px; font-weight: 300;
+    line-height: 1.85; color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .project-link {
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-muted);
+    text-decoration: none; transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .project-link:hover { color: var(--ink); }
+
+  .project-screenshot {
+    overflow: hidden;
+    border: 0.5px solid var(--rule);
+  }
+  .project-screenshot img {
+    width: 100%; display: block;
+    transition: transform 0.6s ease;
+  }
+  .project-item:hover .project-screenshot img { transform: scale(1.015); }
+</style>
+</head>
+<body>
+
+<nav>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About Me</a></li>
+    <li><a href="vita.html">Vita</a></li>
+    <li><a href="journalism.html">Journalism Reporting</a></li>
+    <li><a href="#" class="active">Multimedia</a></li>
+    <li><a href="design.html">Design</a></li>
+    <li><a href="photography.html">Photography</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Multimedia</h1>
+  </div>
+  <p class="page-desc">Projects that use the web as a reporting medium — combining <em>audio</em>, <em>video</em>, <em>photography</em>, <em>360° &amp; 3D video</em>, <em>data analysis &amp; visualization</em>, and <em>text</em> into an integrated presentation.</p>
+
+  <div class="project-list">
+
+    <article class="project-item" style="animation-delay:0.00s">
+      <div class="project-meta">
+        <span class="project-date">Spring 2026</span>
+        <div class="project-tags">
+          <span class="tag">Web</span>
+          <span class="tag">Video</span>
+          <span class="tag">Audio</span>
+          <span class="tag">Data</span>
+          <span class="tag">Photography</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-text">
+          <h2 class="project-title">
+            <a href="https://lrodr29.web.illinois.edu/specimens/" target="_blank" rel="noopener">Behind the Specimens</a>
+          </h2>
+          <p class="project-desc">Yes, one of them is literally about bugs — but hear us out. The project is a collaboration between four journalists, each covering a different beat, built around a subject hiding in plain sight at U of I: one of the largest entomological collections in North America, with over 7 million preserved specimens tucked behind rows of wooden drawers. Situated at the hub of Midwest agriculture and biodiversity research, the university holds resources few people know exist — and we wanted to show what it takes to keep them alive.</p>
+          <p class="project-desc" style="margin-top: -6px;">My contributions spanned the full production pipeline — conducting interviews, field recording, photography, storyboarding the site's narrative structure and UX, building the data visualization, and developing the website end-to-end through vibe coding agents.</p>
+          <a href="https://lrodr29.web.illinois.edu/specimens/" target="_blank" rel="noopener" class="project-link">Visit project ↗</a>
+        </div>
+        <div class="project-screenshot">
+          <img src="screenshot_hero.png" alt="Behind the Specimens — homepage hero" loading="lazy">
+        </div>
+      </div>
+    </article>
+
+  </div>
+</div>
+
+</body>
+</html>

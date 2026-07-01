@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journalism Reporting — Jenny Lin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #eceef0; --ink: #1a1a1c;
+    --ink-soft: #4a4c50; --ink-muted: #8a8e94; --rule: #d0d3d8;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    background: var(--bg); color: var(--ink);
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 300px; mix-blend-mode: overlay; opacity: 0.5;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 28px 52px; white-space: nowrap;
+    background: rgba(236,238,240,0.92); backdrop-filter: blur(8px);
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 11px; font-weight: 400; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--ink-muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 120px 52px 100px;
+  }
+
+  /* Page header */
+  .page-header {
+    margin-bottom: 24px;
+    padding-bottom: 28px;
+    border-bottom: 0.5px solid var(--rule);
+  }
+  .page-desc {
+    font-size: 13.5px; font-weight: 300;
+    line-height: 1.85; color: var(--ink-soft);
+    max-width: 100%; margin-bottom: 52px;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; font-weight: 300;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Story list */
+  .story-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .story-item {
+    display: flex;
+    flex-direction: column;
+    padding: 36px 0;
+    border-bottom: 0.5px solid var(--rule);
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+  .story-meta {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .story-date {
+    font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-muted);
+  }
+  .story-pub {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-muted);
+    opacity: 0.6;
+  }
+
+  .story-body {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .story-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 300;
+    line-height: 1.3; margin-bottom: 14px;
+  }
+  .story-title a {
+    color: var(--ink); text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .story-title a:hover { opacity: 0.55; }
+
+  .story-excerpt {
+    font-size: 13px; font-weight: 300;
+    line-height: 1.85; color: var(--ink-soft);
+    margin-bottom: 18px; max-width: 580px;
+  }
+
+  .story-link {
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .story-link:hover { color: var(--ink); }
+
+  /* Image block */
+  .story-img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: var(--rule);
+  }
+  .story-img img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  .story-item:hover .story-img img { transform: scale(1.03); }
+  .story-img--empty {
+    background: rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .story-img--empty::after {
+    content: ''; display: block;
+    width: 32px; height: 0.5px;
+    background: var(--rule);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About Me</a></li>
+    <li><a href="vita.html">Vita</a></li>
+    <li><a href="#" class="active">Journalism Reporting</a></li>
+    <li><a href="design.html">Design</a></li>
+    <li><a href="photography.html">Photography</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Journalism Reporting</h1>
+  </div>
+  <p class="page-desc">I report across three outlets in the Champaign-Urbana area — a student daily, a watchdog investigative newsroom, and an NPR-affiliated public radio station — drawn to the kind of stories that take time to tell. Whether covering housing pressures, federal funding cuts, or community mental health, I tend toward feature and in-depth reporting that keeps social justice at the center. More recently, I've been folding data analysis and multimedia production into my work as ways to make complex systems legible to readers.</p>
+  <div class="story-list">
+
+    <article class="story-item" style="animation-delay:0.00s">
+      <div class="story-meta">
+        <span class="story-date">May 2026</span>
+        <span class="story-pub">IPM Newsroom</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://ipmnewsroom.org/people-with-mental-illness-are-stuck-in-illinois-jails-awaiting-treatment-a-task-force-seeks-solutions/" target="_blank" rel="noopener">People with mental illness are stuck in Illinois jails awaiting treatment. A task force seeks solutions.</a>
+          </h2>
+          <a href="https://ipmnewsroom.org/people-with-mental-illness-are-stuck-in-illinois-jails-awaiting-treatment-a-task-force-seeks-solutions/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="https://ipmnewsroom.org/wp-content/uploads/2026/05/NEWS20260511_PsychBedWait-768x432.jpg" alt="A woman stands in a courtroom" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.07s">
+      <div class="story-meta">
+        <span class="story-date">March 2026</span>
+        <span class="story-pub">IPM Newsroom</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://ipmnewsroom.org/her-car-was-stolen-and-used-in-a-homicide-now-she-cannot-get-it-back/" target="_blank" rel="noopener">Her car was stolen and used in a homicide. Now she cannot get it back.</a>
+          </h2>
+          <a href="https://ipmnewsroom.org/her-car-was-stolen-and-used-in-a-homicide-now-she-cannot-get-it-back/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="her.jpg" alt="Her car was stolen and used in a homicide. Now she cannot get it back." loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.14s">
+      <div class="story-meta">
+        <span class="story-date">October 2025</span>
+        <span class="story-pub">IPM Newsroom</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://ipmnewsroom.org/urbana-will-explore-alternatives-to-mental-health-crisis-intervention-without-police-involvement/" target="_blank" rel="noopener">Urbana will explore alternatives to mental health crisis intervention without police involvement</a>
+          </h2>
+          <a href="https://ipmnewsroom.org/urbana-will-explore-alternatives-to-mental-health-crisis-intervention-without-police-involvement/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="urbana.jpg" alt="Urbana will explore alternatives to mental health crisis intervention without police involvement" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.21s">
+      <div class="story-meta">
+        <span class="story-date">May 2025</span>
+        <span class="story-pub">CU-CitizenAccess</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://cu-citizenaccess.org/2025/05/doge-reports-cutting-almost-50-million-in-grants-for-university-of-illinois/" target="_blank" rel="noopener">DOGE reports cutting almost $50 million in grants for University of Illinois</a>
+          </h2>
+          <a href="https://cu-citizenaccess.org/2025/05/doge-reports-cutting-almost-50-million-in-grants-for-university-of-illinois/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="doge.jpg" alt="" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.28s">
+      <div class="story-meta">
+        <span class="story-date">May 2025</span>
+        <span class="story-pub">CU-CitizenAccess</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://cu-citizenaccess.org/2025/05/summer-electricity-bills-to-rise-20-in-c-u-area-champaign-plans-to-reinstate-utility-assistance-program-after-one-year-suspension/" target="_blank" rel="noopener">Summer electricity bills to rise 20% in C-U area; Champaign plans to reinstate utility assistance program after one-year suspension</a>
+          </h2>
+          <a href="https://cu-citizenaccess.org/2025/05/summer-electricity-bills-to-rise-20-in-c-u-area-champaign-plans-to-reinstate-utility-assistance-program-after-one-year-suspension/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="summer.jpg" alt="" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.35s">
+      <div class="story-meta">
+        <span class="story-date">February 2025</span>
+        <span class="story-pub">CU-CitizenAccess</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://cu-citizenaccess.org/2025/02/concerns-rise-at-university-of-illinois-over-1-5-billion-in-annual-federal-funding-cutbacks-leading-to-layoffs-and-program-closure/" target="_blank" rel="noopener">Concerns rise at University of Illinois over $1.5 billion in annual federal funding cutbacks leading to layoffs and program closure</a>
+          </h2>
+          <a href="https://cu-citizenaccess.org/2025/02/concerns-rise-at-university-of-illinois-over-1-5-billion-in-annual-federal-funding-cutbacks-leading-to-layoffs-and-program-closure/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="concerns.jpg" alt="" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.42s">
+      <div class="story-meta">
+        <span class="story-date">November 2024</span>
+        <span class="story-pub">The Daily Illini</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://dailyillini.com/life_and_culture-stories/2024/11/15/philippine-cultural-event-renames/" target="_blank" rel="noopener">Annual Philippine cultural event renames for gender inclusion</a>
+          </h2>
+          <a href="https://dailyillini.com/life_and_culture-stories/2024/11/15/philippine-cultural-event-renames/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="Annual.png" alt="" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.49s">
+      <div class="story-meta">
+        <span class="story-date">October 2024</span>
+        <span class="story-pub">The Daily Illini</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://dailyillini.com/news-stories/university-news/campus-life/2024/10/14/ui-students-food-insecurity/" target="_blank" rel="noopener">UI students face food insecurity pressures</a>
+          </h2>
+          <a href="https://dailyillini.com/news-stories/university-news/campus-life/2024/10/14/ui-students-food-insecurity/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="UI.png" alt="" loading="lazy"></div>
+      </div>
+    </article>
+    <article class="story-item" style="animation-delay:0.56s">
+      <div class="story-meta">
+        <span class="story-date">October 2023</span>
+        <span class="story-pub">The Daily Illini</span>
+      </div>
+      <div class="story-body">
+        <div class="story-text">
+          <h2 class="story-title">
+            <a href="https://dailyillini.com/life_and_culture-stories/2023/10/26/gender-womens-studies-house/" target="_blank" rel="noopener">Gender and Women's Studies House endures structural building issues</a>
+          </h2>
+          <a href="https://dailyillini.com/life_and_culture-stories/2023/10/26/gender-womens-studies-house/" target="_blank" rel="noopener" class="story-link">Read story ↗</a>
+        </div>
+        <div class="story-img"><img src="GWS.png" alt="" loading="lazy"></div>
+      </div>
+    </article>
+  </div>
+</div>
+
+</body>
+</html>

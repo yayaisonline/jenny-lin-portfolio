@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jenny Lin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    background: #eceef0;
+    color: #1e1e20;
+    overflow: hidden;
+    width: 100vw; height: 100vh;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 28px 52px; white-space: nowrap;
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; flex-wrap: nowrap; }
+  .nav-links a {
+    font-size: 11px; font-weight: 400; letter-spacing: 0.10em;
+    text-transform: uppercase; color: #8a8e94; text-decoration: none;
+    transition: color 0.2s; white-space: nowrap;
+  }
+  .nav-links a:hover, .nav-links a.active { color: #1e1e20; }
+
+  .greeting {
+    position: fixed; top: 136px; left: 52px;
+    z-index: 10; pointer-events: none;
+  }
+  .greeting p {
+    font-size: 14px; font-weight: 300; line-height: 1.9; color: #111;
+    opacity: 0; transform: translateY(5px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .greeting p:nth-child(2) { animation-delay: 0.28s; }
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+  /* GROUP: right-aligned with nav */
+  #group-container {
+    position: fixed;
+    bottom: 30px;
+    right: -310px;
+    z-index: 10;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.2s forwards,
+               groupSway 7s ease-in-out 2s infinite;
+  }
+  @keyframes groupSway {
+    0%,100% { transform: translateY(0) rotate(-0.3deg); }
+    50%      { transform: translateY(-6px) rotate(0.3deg); }
+  }
+
+  #group-img {
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* invisible hit overlays on top of group */
+  .hit-zone {
+    position: absolute;
+    cursor: grab;
+    border-radius: 4px;
+    /* outline: 1px dashed rgba(255,0,0,0.3); */ /* debug: uncomment to see zones */
+  }
+  .hit-zone:hover { background: rgba(0,0,0,0.0); }
+  .hit-zone:active { cursor: grabbing; }
+
+  .zone-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 7.5px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ccc;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: color 0.2s;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .hit-zone:hover .zone-label { opacity: 1; color: #888; }
+
+  /* FLOATING individual figure — appears when dragged away */
+  .fig-float {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .fig-float.active { display: flex; }
+
+  .float-label {
+    font-size: 8px; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: #888; white-space: nowrap;
+  }
+
+  .fig-float img {
+    display: block;
+    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.08));
+  }
+
+  /* sway animations — only play when figure is resting in group */
+  @keyframes sway1 {
+    0%,100% { transform: rotate(-1.8deg) translateY(0); }
+    50%      { transform: rotate(1.4deg) translateY(-8px); }
+  }
+  @keyframes sway2 {
+    0%,100% { transform: rotate(1.6deg) translateY(-3px); }
+    50%      { transform: rotate(-1.1deg) translateY(5px); }
+  }
+  @keyframes sway3 {
+    0%,100% { transform: rotate(-0.9deg) translateY(2px); }
+    35%      { transform: rotate(2deg) translateY(-6px); }
+    70%      { transform: rotate(-1.6deg) translateY(3px); }
+  }
+  @keyframes sway4 {
+    0%,100% { transform: rotate(1.4deg) translateY(0); }
+    50%      { transform: rotate(-1.7deg) translateY(-9px); }
+  }
+  @keyframes sway5 {
+    0%,100% { transform: rotate(-2deg) translateY(4px); }
+    50%      { transform: rotate(1.2deg) translateY(-5px); }
+  }
+
+
+  @keyframes groupSway {
+    0%,100% { transform: translateX(-50%) translateY(0) rotate(-0.3deg); }
+    50%      { transform: translateX(-50%) translateY(-6px) rotate(0.3deg); }
+  }
+
+  /* DROP RING */
+  #drop-ring {
+    position: fixed; top: 50%; left: 50%;
+    width: 120px; height: 120px; margin: -60px 0 0 -60px;
+    border: 0.8px solid #ccc; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.2s, border-color 0.2s; z-index: 5;
+  }
+  #drop-ring.active { opacity: 1; }
+  #drop-ring span {
+    font-size: 8px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #aaa;
+  }
+
+  #flash {
+    position: fixed; inset: 0; background: #eceef0;
+    opacity: 0; pointer-events: none; z-index: 300;
+    transition: opacity 0.35s;
+  }
+  #flash.on { opacity: 1; }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 300px 300px;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+  }
+
+  /* Per-figure independent dance animations */
+  .fig-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+
+  /* SVG filter for pencil/grain effect on figures */
+  .fig-layer img {
+    display: block;
+    filter: url(#pencil-grain) contrast(1.08) brightness(1.02);
+  }
+  /* Thinner lines for figures 3, 4, 5 */
+  #layer-journalism img,
+  #layer-design img,
+  #layer-photography img {
+    filter: url(#pencil-thin) contrast(1.05) brightness(1.03);
+  }
+  @keyframes dance1 {
+    0%,100% { transform: rotate(-2deg) translateY(0px); }
+    25%      { transform: rotate(1.2deg) translateY(-8px) translateX(2px); }
+    60%      { transform: rotate(-1deg) translateY(-4px) translateX(-2px); }
+    80%      { transform: rotate(2deg) translateY(-10px) translateX(1px); }
+  }
+  @keyframes dance2 {
+    0%,100% { transform: rotate(1.8deg) translateY(-4px); }
+    30%      { transform: rotate(-2deg) translateY(-11px) translateX(-2px); }
+    65%      { transform: rotate(2.4deg) translateY(-2px) translateX(3px); }
+  }
+  @keyframes dance3 {
+    0%,100% { transform: rotate(-1deg) translateY(2px); }
+    35%      { transform: rotate(2.5deg) translateY(-9px); }
+    70%      { transform: rotate(-1.8deg) translateY(-12px) translateX(2px); }
+  }
+  @keyframes dance4 {
+    0%,100% { transform: rotate(1.4deg) translateY(0px); }
+    40%      { transform: rotate(-2deg) translateY(-8px) translateX(-2px); }
+    75%      { transform: rotate(1deg) translateY(-3px) translateX(2px); }
+  }
+  @keyframes dance5 {
+    0%,100% { transform: rotate(-2.2deg) translateY(4px); }
+    45%      { transform: rotate(1.5deg) translateY(-10px) translateX(-1px); }
+    80%      { transform: rotate(-1deg) translateY(-5px) translateX(2px); }
+  }
+  .dance1 { animation: dance1 5.4s ease-in-out infinite; }
+  .dance2 { animation: dance2 6.9s ease-in-out infinite; }
+  .dance3 { animation: dance3 4.7s ease-in-out infinite; }
+  .dance4 { animation: dance4 7.2s ease-in-out infinite; }
+  .dance5 { animation: dance5 5.9s ease-in-out infinite; }
+
+  /* Hover label */
+  .hover-label {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: #1e1e20;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 50;
+  }
+
+  /* Hit zone */
+  .hit-zone {
+    position: absolute;
+    cursor: grab;
+    transition: opacity 0.3s ease;
+  }
+  .hit-zone:active { cursor: grabbing; }
+
+  /* Flash */
+  #flash {
+    position: fixed; inset: 0; background: #eceef0;
+    opacity: 0; pointer-events: none; z-index: 300;
+    transition: opacity 0.35s;
+  }
+  #flash.on { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Base pencil grain for all figures -->
+    <filter id="pencil-grain" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blended"/>
+      <feMorphology operator="erode" radius="0.5" in="blended" result="thinned"/>
+      <feComposite in="thinned" in2="SourceGraphic" operator="in"/>
+    </filter>
+    <!-- Thinner version for figures 3, 4, 5 -->
+    <filter id="pencil-thin" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blended"/>
+      <feMorphology operator="erode" radius="0.55" in="blended" result="thinned"/>
+      <feComponentTransfer in="thinned" result="lighter">
+        <feFuncA type="linear" slope="0.85"/>
+      </feComponentTransfer>
+      <feComposite in="lighter" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<nav>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="about.html">About Me</a></li>
+    <li><a href="vita.html">Vita</a></li>
+    <li><a href="journalism.html">Journalism Reporting</a></li>
+    <li><a href="design.html">Design</a></li>
+    <li><a href="photography.html">Photography</a></li>
+  </ul>
+</nav>
+
+<div class="greeting">
+  <p>Hi,</p>
+  <p>this is Jenny Lin's archives.</p>
+</div>
+
+<!-- Full connected group -->
+<div id="group-container">
+  <img id="group-img" src="" alt="Matisse La Danse">
+  <!-- hit zones injected by JS -->
+</div>
+
+<!-- floating individual figures (one per figure, shown while dragging) -->
+<div id="flash"></div>
+<div id="drop-ring"><span>enter</span></div>
+
+
+<script>
+const FULL_SRC = 'full.png';
+const DISPLAY_W=560, DISPLAY_H=450;
+const FIGURES = [
+  {
+    id: 'about', label: 'About Me', href: 'about.html',
+    sway: 'sway1', w: 165, h: 275,
+    src: '1.png'
+  },
+  {
+    id: 'vita', label: 'Vita', href: 'vita.html',
+    sway: 'sway2', w: 143, h: 220,
+    src: '2.png'
+  },
+  {
+    id: 'journalism', label: 'Journalism', href: 'journalism.html',
+    sway: 'sway3', w: 200, h: 220,
+    src: '3.png'
+  },
+  {
+    id: 'design', label: 'Design', href: 'design.html',
+    sway: 'sway4', w: 280, h: 220,
+    src: '4.png'
+  },
+  {
+    id: 'photography', label: 'Photography', href: 'photography.html',
+    sway: 'sway5', w: 191, h: 220,
+    src: '5.png'
+  }
+];
+const POLYGONS = {
+  'about': 'polygon(129.9px 379.5px, 120.4px 376.7px, 113.7px 370.8px, 107.5px 364.4px, 104.2px 355.2px, 108.1px 346.5px, 109.3px 335.3px, 105.7px 326.3px, 100.2px 319.0px, 95.0px 311.8px, 89.8px 303.9px, 84.6px 296.2px, 76.4px 292.2px, 71.3px 299.4px, 69.4px 310.1px, 69.4px 322.0px, 65.6px 331.3px, 62.6px 340.3px, 57.2px 348.1px, 51.0px 354.6px, 44.3px 361.0px, 37.0px 365.6px, 26.3px 364.8px, 19.0px 359.0px, 12.7px 352.6px, 7.8px 345.3px, 8.7px 334.7px, 11.3px 324.6px, 13.8px 314.0px, 15.6px 302.8px, 16.7px 291.6px, 17.8px 279.9px, 18.1px 267.5px, 18.6px 255.2px, 21.9px 246.3px, 27.2px 238.4px, 32.4px 230.6px, 36.1px 221.6px, 35.7px 211.0px, 32.8px 200.9px, 30.6px 190.3px, 30.8px 178.0px, 32.8px 167.4px, 35.4px 157.3px, 38.7px 147.8px, 42.9px 138.8px, 47.1px 131.0px, 53.8px 124.8px, 62.7px 128.3px, 69.5px 134.3px, 76.1px 140.5px, 82.8px 146.6px, 89.4px 152.8px, 96.1px 159.0px, 102.7px 165.1px, 109.2px 171.1px, 115.4px 177.8px, 119.3px 186.6px, 123.8px 194.8px, 128.2px 202.9px, 129.9px 213.6px, 126.6px 223.3px, 123.2px 232.4px, 125.4px 242.4px, 129.3px 251.3px, 132.4px 260.8px, 135.5px 270.6px, 140.4px 278.2px, 145.4px 286.0px, 149.8px 294.4px, 153.9px 303.4px, 158.1px 311.2px, 160.8px 321.3px, 157.6px 330.8px, 153.5px 339.7px, 149.7px 348.1px, 145.6px 357.1px, 141.7px 365.8px, 137.2px 374.4px, 129.9px 379.5px)',
+  'vita': 'polygon(204.4px 245.2px, 196.6px 242.4px, 193.4px 234.5px, 191.2px 225.6px, 186.6px 218.8px, 180.1px 214.4px, 172.5px 210.8px, 164.6px 207.6px, 157.7px 203.7px, 151.2px 198.7px, 145.6px 193.4px, 140.0px 187.8px, 134.4px 182.2px, 128.2px 177.0px, 119.3px 175.0px, 110.9px 172.2px, 105.1px 167.4px, 99.1px 161.8px, 93.5px 156.6px, 87.6px 151.1px, 81.8px 145.7px, 76.1px 140.5px, 70.1px 134.9px, 64.4px 129.6px, 59.4px 124.2px, 58.0px 115.3px, 62.2px 108.4px, 65.4px 100.2px, 66.3px 90.1px, 68.9px 81.4px, 72.8px 74.4px, 77.8px 68.2px, 83.2px 62.7px, 88.8px 57.1px, 94.4px 51.5px, 100.3px 46.5px, 107.5px 42.1px, 115.4px 38.9px, 123.8px 36.0px, 132.2px 33.6px, 141.7px 32.1px, 152.9px 32.2px, 162.4px 30.6px, 170.6px 27.4px, 179.8px 25.6px, 189.8px 24.1px, 198.8px 22.4px, 208.9px 21.2px, 219.0px 21.6px, 228.3px 23.5px, 238.6px 24.3px, 248.6px 23.0px, 258.2px 25.0px, 266.0px 28.3px, 270.9px 34.7px, 270.4px 44.2px, 269.0px 53.7px, 267.6px 63.2px, 266.1px 73.3px, 264.7px 82.8px, 263.2px 92.9px, 261.8px 102.4px, 260.4px 112.0px, 258.9px 122.0px, 257.6px 131.0px, 256.1px 141.0px, 254.7px 150.6px, 253.2px 160.6px, 251.8px 170.1px, 250.3px 180.0px, 248.9px 189.7px, 247.5px 199.3px, 246.1px 208.8px, 244.6px 218.3px, 241.9px 227.2px, 236.3px 232.6px, 228.5px 236.1px, 220.6px 239.3px, 212.8px 242.5px, 204.4px 245.2px)',
+  'journalism': 'polygon(415.2px 0.0px, 420.7px 7.3px, 428.3px 13.4px, 436.8px 18.1px, 446.3px 21.4px, 456.4px 25.1px, 465.4px 29.2px, 473.8px 34.3px, 481.4px 39.7px, 488.3px 46.2px, 495.0px 52.9px, 501.4px 59.3px, 507.9px 66.6px, 513.0px 74.4px, 511.8px 85.3px, 505.7px 92.4px, 499.3px 99.1px, 492.8px 105.8px, 486.4px 112.5px, 479.9px 119.2px, 473.2px 126.2px, 466.5px 133.1px, 460.3px 139.6px, 453.6px 146.5px, 447.1px 153.4px, 440.5px 160.1px, 434.2px 166.8px, 427.6px 173.5px, 421.1px 180.3px, 414.7px 186.9px, 408.2px 193.7px, 401.5px 200.7px, 394.8px 207.6px, 388.6px 214.1px, 381.9px 221.0px, 375.4px 227.8px, 369.0px 234.4px, 362.5px 241.2px, 355.1px 247.4px, 344.4px 249.0px, 333.2px 247.1px, 322.0px 245.0px, 310.5px 242.9px, 299.0px 240.8px, 288.4px 238.8px, 277.2px 236.7px, 265.4px 234.5px, 254.8px 232.4px, 246.2px 227.8px, 244.9px 216.6px, 246.6px 204.9px, 248.3px 193.7px, 250.0px 181.9px, 251.8px 170.1px, 253.4px 159.0px, 255.2px 147.2px, 256.9px 135.4px, 258.7px 123.7px, 260.3px 112.5px, 262.1px 100.7px, 263.8px 89.3px, 265.5px 77.8px, 267.1px 66.6px, 268.9px 54.9px, 270.6px 43.1px, 273.2px 32.5px, 281.1px 27.0px, 292.3px 28.3px, 301.0px 33.0px, 308.0px 39.1px, 314.9px 45.3px, 325.4px 47.1px, 332.3px 41.4px, 339.1px 34.7px, 346.1px 28.0px, 353.9px 22.4px, 362.3px 18.4px, 371.8px 14.1px, 379.1px 8.1px, 384.3px 0.0px)',
+  'design': 'polygon(105.5px 449.4px, 108.7px 438.2px, 113.3px 428.2px, 118.1px 417.5px, 122.7px 408.0px, 131.0px 400.8px, 144.5px 399.9px, 159.6px 399.9px, 174.2px 399.9px, 188.7px 399.9px, 203.8px 399.9px, 218.4px 399.9px, 233.5px 399.9px, 248.1px 399.9px, 263.2px 399.9px, 277.8px 399.9px, 292.9px 399.9px, 307.4px 399.9px, 322.0px 399.9px, 337.1px 399.9px, 351.7px 399.8px, 365.7px 399.0px, 369.6px 393.0px, 359.7px 387.9px, 347.8px 385.2px, 336.3px 381.7px, 327.6px 376.1px, 320.0px 368.8px, 312.5px 361.2px, 305.8px 353.4px, 299.4px 344.8px, 293.9px 335.8px, 288.6px 325.7px, 285.2px 314.6px, 283.8px 301.1px, 282.6px 287.7px, 274.3px 281.5px, 262.6px 278.1px, 252.6px 273.5px, 240.8px 272.1px, 231.3px 277.4px, 220.1px 274.4px, 212.5px 267.5px, 205.0px 259.8px, 201.3px 250.2px, 209.4px 243.9px, 220.1px 239.5px, 230.7px 235.2px, 242.1px 231.7px, 255.4px 232.7px, 268.2px 235.0px, 280.5px 237.3px, 292.9px 239.6px, 305.2px 241.9px, 317.5px 244.2px, 330.4px 246.6px, 342.7px 249.0px, 353.2px 253.5px, 359.1px 261.9px, 364.5px 272.0px, 369.5px 281.5px, 374.6px 291.2px, 379.7px 300.7px, 384.7px 310.2px, 390.0px 320.1px, 395.0px 329.7px, 400.4px 339.7px, 405.4px 349.3px, 410.5px 358.9px, 415.5px 368.8px, 415.3px 380.6px, 408.7px 388.4px, 404.3px 397.1px, 416.6px 399.8px, 429.5px 401.5px, 437.0px 409.1px, 442.2px 418.7px, 447.4px 428.6px, 452.5px 438.2px, 456.3px 449.4px)',
+  'photography': 'polygon(453.0px 387.4px, 442.4px 384.8px, 433.0px 380.6px, 423.9px 376.7px, 416.7px 370.0px, 411.9px 361.6px, 407.2px 352.6px, 402.6px 344.1px, 398.0px 335.3px, 393.2px 326.3px, 388.6px 317.6px, 384.0px 309.0px, 379.3px 300.0px, 374.6px 291.2px, 370.1px 282.6px, 365.4px 273.7px, 360.6px 264.8px, 356.7px 255.8px, 359.2px 245.1px, 365.7px 238.0px, 372.2px 231.2px, 378.7px 224.4px, 385.3px 217.5px, 392.0px 210.6px, 398.5px 203.7px, 405.1px 197.0px, 411.6px 190.2px, 418.3px 183.2px, 424.9px 176.3px, 431.4px 169.6px, 437.9px 162.8px, 444.6px 155.9px, 451.3px 148.9px, 457.8px 142.2px, 464.3px 135.4px, 471.0px 128.5px, 477.7px 121.5px, 484.2px 114.7px, 490.7px 108.0px, 497.3px 101.1px, 504.2px 94.0px, 511.3px 87.4px, 520.8px 88.1px, 525.4px 96.8px, 527.9px 108.0px, 527.5px 119.8px, 522.9px 128.7px, 523.4px 139.4px, 529.2px 146.6px, 534.2px 155.3px, 538.5px 164.6px, 542.9px 173.5px, 547.7px 182.5px, 549.1px 194.2px, 546.1px 204.9px, 542.7px 214.9px, 541.0px 226.7px, 539.4px 238.4px, 536.1px 248.5px, 530.9px 256.6px, 525.4px 264.7px, 520.2px 272.8px, 515.8px 281.7px, 513.0px 292.6px, 513.5px 303.5px, 519.1px 311.8px, 523.6px 320.3px, 528.9px 328.5px, 533.1px 337.7px, 530.2px 347.6px, 525.3px 356.2px, 519.1px 363.5px, 512.4px 370.2px, 505.1px 376.6px, 494.7px 378.9px, 486.1px 374.2px, 477.1px 370.6px, 468.7px 375.9px, 462.0px 382.4px, 453.0px 387.4px)'
+};
+
+
+// Set up DOM references
+const groupImg  = document.getElementById('group-img');
+const groupCont = document.getElementById('group-container');
+const dropRing  = document.getElementById('drop-ring');
+const flashEl   = document.getElementById('flash');
+
+groupImg.src    = FULL_SRC;
+groupImg.width  = DISPLAY_W;
+groupImg.height = DISPLAY_H;
+groupImg.style.opacity = '0'; // hide base image, use fig-layers instead
+
+// ── Per-figure positions matching the correct group layout ──
+const FIG_LAYER_POS = {
+  'about':       { left: 0,   top: 20,  cls: 'dance1' },
+  'vita':        { left: 120, top: 0,   cls: 'dance2' },
+  'journalism':  { left: 230, top: 10,  cls: 'dance3' },
+  'photography': { left: 285, top: 120,  cls: 'dance5' },
+  'design':      { left: 130, top: 155, cls: 'dance4' },
+};
+
+const FIG_CENTERS = {
+  'about':       [82,  158],
+  'vita':        [191, 110],
+  'journalism':  [330, 120],
+  'design':      [270, 265],
+  'photography': [380, 230]
+};
+
+// Build fig-layers (individual dancing images)
+FIGURES.forEach((fig) => {
+  const pos = FIG_LAYER_POS[fig.id];
+  if (!pos) return;
+  const layer = document.createElement('div');
+  layer.className = 'fig-layer ' + pos.cls;
+  layer.id = 'layer-' + fig.id;
+  layer.style.left = pos.left + 'px';
+  layer.style.top  = pos.top  + 'px';
+
+  // Hover label above figure
+  const lbl = document.createElement('div');
+  lbl.className = 'hover-label';
+  lbl.id = 'label-' + fig.id;
+  lbl.textContent = fig.label;
+  layer.appendChild(lbl);
+
+  const img = document.createElement('img');
+  img.src = fig.src;
+  img.width  = fig.w;
+  img.height = fig.h;
+  img.draggable = false;
+  img.style.display = 'block';
+  layer.appendChild(img);
+  groupCont.appendChild(layer);
+});
+
+// ── Hit zones + hover + drag ──
+const allZones = [];
+
+FIGURES.forEach((fig, i) => {
+  const zone = document.createElement('div');
+  zone.className = 'hit-zone';
+  zone.style.left     = '0px';
+  zone.style.top      = '0px';
+  zone.style.width    = DISPLAY_W + 'px';
+  zone.style.height   = DISPLAY_H + 'px';
+  zone.style.clipPath = POLYGONS[fig.id] || '';
+  zone.dataset.figId  = fig.id;
+  groupCont.appendChild(zone);
+  allZones.push({ zone, fig });
+
+  // ── Hover: dim others ──
+  zone.addEventListener('mouseenter', () => {
+    allZones.forEach(({ fig: f }) => {
+      const layer = document.getElementById('layer-' + f.id);
+      const lbl   = document.getElementById('label-' + f.id);
+      if (f.id === fig.id) {
+        if (layer) { layer.style.opacity = '1'; layer.style.transition = 'opacity 0.3s'; }
+        if (lbl)   lbl.style.opacity = '1';
+      } else {
+        if (layer) { layer.style.opacity = '0.12'; layer.style.transition = 'opacity 0.3s'; }
+        if (lbl)   lbl.style.opacity = '0';
+      }
+    });
+  });
+
+  zone.addEventListener('mouseleave', () => {
+    allZones.forEach(({ fig: f }) => {
+      const layer = document.getElementById('layer-' + f.id);
+      const lbl   = document.getElementById('label-' + f.id);
+      if (layer) { layer.style.opacity = '1'; layer.style.transition = 'opacity 0.3s'; }
+      if (lbl)   lbl.style.opacity = '0';
+    });
+  });
+
+  // ── Drag ──
+  let dragging = false, startX, startY, floatX, floatY;
+  const THRESH = 110;
+
+  const floater = document.createElement('div');
+  floater.className = 'fig-float';
+  floater.id = 'float-' + fig.id;
+  const fLabel = document.createElement('div');
+  fLabel.className = 'float-label';
+  fLabel.textContent = fig.label;
+  const fImg = document.createElement('img');
+  fImg.src = fig.src; fImg.width = fig.w; fImg.height = fig.h; fImg.draggable = false;
+  floater.appendChild(fLabel); floater.appendChild(fImg);
+  document.body.appendChild(floater);
+
+  function startDrag(e) {
+    dragging = true;
+    const p = e.touches ? e.touches[0] : e;
+    startX = p.clientX; startY = p.clientY;
+    const groupRect = groupCont.getBoundingClientRect();
+    const [fcx, fcy] = FIG_CENTERS[fig.id];
+    floatX = groupRect.left + fcx - fig.w/2;
+    floatY = groupRect.top  + fcy - fig.h/2;
+    floater.style.left = floatX + 'px';
+    floater.style.top  = floatY + 'px';
+    floater.classList.add('active');
+    const layer = document.getElementById('layer-' + fig.id);
+    if (layer) layer.style.opacity = '0.15';
+    dropRing.classList.add('active');
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const nx = floatX + p.clientX - startX;
+    const ny = floatY + p.clientY - startY;
+    floater.style.left = nx + 'px';
+    floater.style.top  = ny + 'px';
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    const dist = Math.hypot(nx + fig.w/2 - cx, ny + fig.h/2 - cy);
+    floater.style.opacity = dist < THRESH ? '0.3' : '1';
+    dropRing.style.borderColor = dist < THRESH ? '#1e1e20' : '#8a8e94';
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    dropRing.classList.remove('active');
+    dropRing.style.borderColor = '#8a8e94';
+    const layer = document.getElementById('layer-' + fig.id);
+    if (layer) layer.style.opacity = '1';
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    const dist = Math.hypot(
+      parseFloat(floater.style.left) + fig.w/2 - cx,
+      parseFloat(floater.style.top)  + fig.h/2 - cy
+    );
+    if (dist < THRESH) {
+      floater.style.transition = 'transform 0.3s, opacity 0.3s';
+      floater.style.transform = 'scale(0.05)';
+      floater.style.opacity = '0';
+      flashEl.classList.add('on');
+      setTimeout(() => window.location.href = fig.href, 360);
+    } else {
+      floater.style.transition = 'left 0.55s cubic-bezier(.34,1.56,.64,1), top 0.55s cubic-bezier(.34,1.56,.64,1)';
+      floater.style.left = floatX + 'px';
+      floater.style.top  = floatY + 'px';
+      setTimeout(() => {
+        floater.classList.remove('active');
+        floater.style.transition = '';
+        floater.style.transform  = '';
+      }, 580);
+    }
+  }
+
+  zone.addEventListener('mousedown',  startDrag);
+  zone.addEventListener('touchstart', startDrag, { passive: false });
+  window.addEventListener('mousemove',  onMove);
+  window.addEventListener('touchmove',  onMove, { passive: false });
+  window.addEventListener('mouseup',   onUp);
+  window.addEventListener('touchend',  onUp);
+});
+
+</script>
+</body>
+</html>
